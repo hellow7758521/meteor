@@ -29,6 +29,7 @@ static const LPCWSTR WIXSTDBA_VARIABLE_LAUNCH_HIDDEN      = L"LaunchHidden";
 static const LPCWSTR WIXSTDBA_VARIABLE_LAUNCHAFTERINSTALL_TARGET_PATH = L"LaunchAfterInstallTarget";
 static const LPCWSTR WIXSTDBA_VARIABLE_LAUNCHAFTERINSTALL_ARGUMENTS   = L"LaunchAfterInstallArguments";
 
+static const LPCWSTR WIXSTDBA_VARIABLE_VERSION = L"Version";
 static const LPCWSTR WIXSTDBA_VARIABLE_PROGRESS_HEADER = L"varProgressHeader";
 static const LPCWSTR WIXSTDBA_VARIABLE_PROGRESS_INFO   = L"varProgressInfo";
 static const LPCWSTR WIXSTDBA_VARIABLE_SUCCESS_HEADER  = L"varSuccessHeader";
@@ -3737,6 +3738,20 @@ BOOL REST_SignInOrRegister(
 		// register
 		StringCchPrintfW(wzFormData, BUF_LEN, L"username=%s&email=%s&password=%s", wzRegisterUserName, wzRegisterEmail, wzPassword);
 	}
+
+  // agentInfo part of the query
+  wchar_t aiHost[BUF_LEN] = L"";
+  GetComputerName(aiHost, BUF_LEN);
+
+  wchar_t aiAgentVersion[BUF_LEN] = L"";
+  BalGetStringVariable(WIXSTDBA_VARIABLE_VERSION, aiAgentVersion);
+  MessageBoxW(NULL, aiAgentVersion, NULL, NULL);
+
+  wchar_t wzAgentInfo[BUF_LEN] = L"";
+  StringCchPrintfW(wzAgentInfo, BUF_LEN, L"agentInfo[host]=%s&agentInfo[agent]=%s&agentInfo[agentVersion]=%s&agentInfo[arch]=%s",
+      aiHost, L"Windows Installer", aiAgentVersion, L"os.windows.x64_32");
+  StringCchCat(wzFormData, BUF_LEN, L"&");
+  StringCchCat(wzFormData, BUF_LEN, wzAgentInfo);
 
   size_t i;
   char *pMBFormData = (char *)malloc( BUF_LEN );
